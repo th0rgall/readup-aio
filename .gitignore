@@ -1,0 +1,4 @@
+api/appsettings.json
+web/config.prod.json
+proxy/nginx.conf
+.env

@@ -1,0 +1,28 @@
+{
+	"apiServer": {
+		"protocol": "https",
+		"host": "api.${READUP_HOST}"
+	},
+	"chromeExtensionId": "mkeiglkfdfamdjehidenkklibndmljfi",
+	"contentRootPath": "./client",
+	"cookieDomain": ".${READUP_HOST}",
+	"cookieName": "sessionKey",
+	"logStream": {
+		"type": "rotating-file",
+		"path": "./logs/app.log",
+		"period": "1d",
+		"count": 31,
+		"level": "warn"
+	},
+	"packageFilePath": "./package.json",
+	"secureCookie": true,
+	"serveStaticContent": false,
+	"staticServer": {
+		"protocol": "https",
+		"host": "static.${READUP_HOST}"
+	},
+	"webServer": {
+		"protocol": "https",
+		"host": "${READUP_HOST}"
+	}
+}

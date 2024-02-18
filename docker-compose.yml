@@ -1,0 +1,86 @@
+version: "3.8"
+services:
+  # Pre-build step:
+  # Generates configuration files for all other containers
+  # based on the templates provided, substituting in variables
+  # from the .env file
+  config:
+    build: ./config
+    volumes:
+      - ./:/config
+    env_file: .env
+
+  db:
+    build: ./db
+    container_name: readup-db-prod
+    hostname: readup-db
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - readup-db-data-prod:/var/lib/postgresql/data
+
+  api:
+    build: ./api
+    container_name: readup-api-prod
+    hostname: readup-api
+    depends_on:
+      - config
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./api/appsettings.json:/App/appsettings.json
+      - ./api/hostsettings.json:/App/hostsettings.json
+      - ./api/web.config:/App/web.config
+      - readup-api-keys:/Keys
+
+  web:
+    build: ./web
+    container_name: readup-web-prod
+    hostname: readup-web
+    depends_on:
+      - config
+      - api
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+    volumes:
+      - ./web/config.prod.json:/app/server/app/server/config.prod.json
+      # Copy the built /app/client into the web-client volume
+      - web-client:/app/client
+    # This allows `web` to access api.${READUP_HOST}
+    # TODO: this came from dev-env. Does the web server, in the server context, need to do this?
+    # And shouldn't it work with public/automatic DNS/IP too?
+    extra_hosts:
+      - "api.${READUP_HOST}:host-gateway"
+
+  # Reverse proxy + static server
+  proxy:
+    container_name: readup-proxy-prod
+    hostname: readup-proxy
+    # nginx will report emergency failures when upstream hosts are not found (readup-api, readup-web)
+    depends_on:
+      - config
+      - web
+      - api
+    build: ./proxy
+    labels:
+      caddy: "${READUP_HOST}, api.${READUP_HOST}, static.${READUP_HOST}"
+      caddy.reverse_proxy: "{{upstreams http 80}}"
+    networks:
+      - caddy
+      - default
+    volumes:
+      # The reverse proxy needs to access several repositories
+      # to statically host certain directories and files under
+      # static.${READUP_HOST}
+      - web-client:/client:ro
+
+volumes:
+  readup-db-data-prod:
+  web-client:
+  readup-api-keys:
+
+networks:
+  caddy:
+    external: true
