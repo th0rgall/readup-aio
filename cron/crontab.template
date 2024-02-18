@@ -1,0 +1,42 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+
+# Be careful for https://unix.stackexchange.com/questions/8584/using-the-system--data-urlencodeate-time-in-a-cron-script#comment10740_8587
+# Also see https://stackoverflow.com/a/61259844/4973029
+# How to only interpolate an env var after envsubst: * * * * * echo "Crontab is working - watchdog 1" $${q}PGHOST
+
+*/5 * * * * psql --command="SELECT article_api.score_articles()"
+*/5 * * * * psql --command="REFRESH MATERIALIZED VIEW CONCURRENTLY stats.current_streak"
+0 8 * * * curl --data-urlencode "ApiKey=${READUP_API_KEY}" -X POST https://api.${READUP_HOST}/Articles/SetAotd
+
+# Disabled for now
+# 0 9 * * * curl --data-urlencode "ApiKey=${READUP_API_KEY}" -X POST https://api.${READUP_HOST}/TwitterBot/TweetAotd
+# 1 11 * * * curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Daily" -X POST https://api.${READUP_HOST}/Notifications/FollowerDigest
+# 2 11 * * * curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Daily" -X POST https://api.${READUP_HOST}/Notifications/LoopbackDigest
+# 3 11 * * * curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Daily" -X POST https://api.${READUP_HOST}/Notifications/PostDigest
+# 4 11 * * * curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Daily" -X POST https://api.${READUP_HOST}/Notifications/ReplyDigest
+# 5 11 * * 2 curl --data-urlencode "ApiKey=${READUP_API_KEY}" -X POST https://api.${READUP_HOST}/Notifications/AotdDigest
+# 6 11 * * 2 curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Weekly" -X POST https://api.${READUP_HOST}/Notifications/FollowerDigest
+# 7 11 * * 2 curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Weekly" -X POST https://api.${READUP_HOST}/Notifications/LoopbackDigest
+# 8 11 * * 2 curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Weekly" -X POST https://api.${READUP_HOST}/Notifications/PostDigest
+# 9 11 * * 2 curl --data-urlencode "ApiKey=${READUP_API_KEY}&Frequency=Weekly" -X POST https://api.${READUP_HOST}/Notifications/ReplyDigest

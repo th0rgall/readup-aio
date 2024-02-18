@@ -34,6 +34,17 @@ services:
       - ./api/web.config:/App/web.config
       - readup-api-keys:/Keys
 
+  cron:
+    build: ./cron
+    depends_on:
+      - config
+      - db
+      - api
+    volumes:
+      - ./cron/crontab:/crontab
+    env_file:
+      - ./cron/cron.env
+
   web:
     build: ./web
     container_name: readup-web-prod
