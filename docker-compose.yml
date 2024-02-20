@@ -84,6 +84,7 @@ services:
     depends_on:
       - config
       - web
+      - ink
       - api
     build: ./proxy
     labels:
