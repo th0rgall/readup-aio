@@ -28,11 +28,11 @@ Consider this bundle experimental, especially in terms of user experience, as Re
 2. Point the following domains to your server's IP: `api.{YOUR_DOMAIN}`, `static.{YOUR_DOMAIN}`, `ink.{YOUR_DOMAIN}`, and `{YOUR_DOMAIN}` itself.
 3. Run `docker compose up -d` OR `docker compose -f docker-compose.external.yml up -d`, depending on which reverse proxy setup you use.
 
-# Limitations
+## Limitations
 
 The following sub-services are currently not yet supported or configured, however, by overriding the right files in the compose file, and fulfilling their requirements, you can probably get them to work!
 
-- Email (!) (that includes all transaction emails like password reset email, and regular emails like "Article of the Day")
+- Email (!) (that includes all transactional emails like password reset email, and regular emails like "Article of the Day")
 - Twitter (X) authentication
 - Apple authentication
 - Push notifications
