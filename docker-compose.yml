@@ -5,6 +5,7 @@ services:
   # based on the templates provided, substituting in variables
   # from the .env file
   config:
+    container_name: readup-config-prod
     build: ./config
     volumes:
       - ./:/config
@@ -36,6 +37,7 @@ services:
 
   cron:
     build: ./cron
+    container_name: readup-cron-prod
     depends_on:
       - config
       - db
@@ -65,6 +67,15 @@ services:
     extra_hosts:
       - "api.${READUP_HOST}:host-gateway"
 
+  ink:
+    build: https://github.com/th0rgall/readup-kindle.git#alt
+    container_name: readup-ink-prod
+    hostname: readup-ink
+    environment:
+      - READUP_HOST=https://${READUP_HOST}
+    extra_hosts:
+      - "api.${READUP_HOST}:host-gateway"
+
   # Reverse proxy + static server
   proxy:
     container_name: readup-proxy-prod
@@ -76,7 +87,7 @@ services:
       - api
     build: ./proxy
     labels:
-      caddy: "${READUP_HOST}, api.${READUP_HOST}, static.${READUP_HOST}"
+      caddy: "${READUP_HOST}, api.${READUP_HOST}, static.${READUP_HOST}, ink.${READUP_HOST}"
       caddy.reverse_proxy: "{{upstreams http 80}}"
     networks:
       - caddy
